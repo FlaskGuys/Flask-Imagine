@@ -145,14 +145,9 @@ class Imagine(object):
             if target_width > original_width:
                 target_width = original_width
                 target_height = original_width / k
-            else:
+            else if target_height > original_height:
                 target_height = original_height
                 target_width = original_height * k
-
-            if target_width > original_width or target_height > original_height:
-                target_width, target_height = cls.scale_sizes(
-                    original_width, original_height, target_width, target_height
-                )
 
         return target_width, target_height
 
