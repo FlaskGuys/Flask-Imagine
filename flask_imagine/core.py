@@ -75,6 +75,22 @@ class Imagine(object):
         # todo: Must be realized in the future
         return filters_config
 
+    def generate_url(self, input_url):
+        if current_app.config.get('IMAGINE_BASE_DOMAIN'):
+            from urlparse import urlparse
+            domain = 'vk.com'
+            parsed = urlparse(input_url)
+            replaced = {
+                'netloc': domain
+            }
+
+            if current_app.config.get('IMAGINE_BASE_SCHEME'):
+                replaced.update({'scheme': current_app.config.get('IMAGINE_BASE_SCHEME')})
+            parsed = parsed._replace(**replaced)
+            return parsed.geturl()
+
+        return input_url
+
     def build_url(self, path, filter_name, **kwargs):
         if filter_name not in self.filters:
             raise FilterNotFound(code=201, msg='Filter %s has been not found in config' % filter_name)
@@ -84,7 +100,7 @@ class Imagine(object):
         cached_key = self.bucket.get_key(current_app.config['IMAGINE_THUMBS_PATH'] + '/' + filter_name + '/' + path)
 
         if cached_key is not None:
-            return cached_key.generate_url(expires_in=0, query_auth=False)
+            return generate_url(cached_key.generate_url(expires_in=0, query_auth=False))
         else:
             original_key = self.bucket.get_key(path)
             if original_key is not None:
@@ -168,7 +184,7 @@ class Imagine(object):
         os.remove(local_file_path)
         os.remove(cache_file_path)
 
-        return redirect(cached_key.generate_url(expires_in=0, query_auth=False), code=301)
+        return redirect(generate_url(cached_key.generate_url(expires_in=0, query_auth=False)), code=301)
 
     def resize(self, image, background=None, **kw):
 
