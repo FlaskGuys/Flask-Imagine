@@ -138,6 +138,19 @@ class Imagine(object):
     def calculate_size(self, path, **kw):
         return ImageSize(path=self.find_img(path), **kw)
 
+    @classmethod
+    def scale_sizes(cls, original_width, original_height, target_width, target_height):
+        if target_width > original_width or target_height > original_height:
+            k = target_width / target_height
+            if target_width > original_width:
+                target_width = original_width
+                target_height = original_width / k
+            else if target_height > original_height:
+                target_height = original_height
+                target_width = original_height * k
+
+        return target_width, target_height
+
     def _scale(self, original_key, filter_name):
         local_directory = current_app.config['IMAGINE_CACHE'] + '/' + filter_name + \
                           '/' + os.path.dirname(original_key.name)
@@ -146,10 +159,18 @@ class Imagine(object):
         original_key.get_contents_to_filename(local_file_path)
 
         image = Image.open(local_file_path)
+
+        target_width = self.filters[filter_name]['width']
+        target_height = self.filters[filter_name]['height']
+
+        if 'scale_sizes' not in self.filters[filter_name] or self.filters[filter_name]['scale_sizes']:
+            original_width, original_height = image.size
+            target_width, target_height = self.scale_sizes(original_width, original_height, target_width, target_height)
+
         image = self.resize(image,
-                            height=self.filters[filter_name]['height'],
+                            height=target_height,
                             mode='fit',
-                            width=self.filters[filter_name]['width'])
+                            width=target_width)
 
         format = (os.path.splitext(local_file_path)[1][1:] or 'jpeg').lower()
         format = {'jpg': 'jpeg'}.get(format, format)
