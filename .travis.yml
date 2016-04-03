@@ -5,13 +5,7 @@ git:
   submodules: false
 
 python:
-  - "2.6"
   - "2.7"
-  - "3.2"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.5-dev" # 3.5 development branch
   - "pypy"
 
 env:
@@ -25,6 +19,7 @@ before_install:
   - sudo ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so ~/virtualenv/python2.7/lib/
   - sudo ln -s /usr/lib/`uname -i`-linux-gnu/libz.so ~/virtualenv/python2.7/lib/
   - pip install nose
+  - pip install boto>=2.38.0
 
 install:
   - pip install Flask$FLASK_VERSION
