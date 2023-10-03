@@ -22,7 +22,7 @@ setup(
 
         'Flask>=0.9',
         'itsdangerous>=0.24',  # For Flask v0.9
-        'Pillow==8.3.2',
+        'Pillow==10.0.1',
         'six>=1.10.0',
 
     ],
